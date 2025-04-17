@@ -91,7 +91,7 @@ export const updateCourse = async (req, res, next) => {
     //   validatedData.videoUrl = result.secure_url;
     // }
 
-    const course = await CourseModel.findByIdAndUpdate(req.params.id, value, {
+    const course = await CourseModel.findByIdAndUpdate(req.auth.id, value, {
       new: true,
       runValidators: true,
     });
@@ -137,7 +137,7 @@ export const replaceCourse = async (req, res, next) => {
 
     // Perform replace operation
     const result = await UserModel.findOneAndReplace(
-      { _id: req.params.id },
+      { _id: req.auth.id },
       value,
       { returnDocument: "after" } 
     );
