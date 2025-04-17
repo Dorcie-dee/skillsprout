@@ -1,7 +1,8 @@
 import { CourseModel } from "../models/course_model.js";
 // import { validateCourse } from "../validators/courseValidator.js";
 import { v2 as cloudinary } from "cloudinary";
-import { courseValidator } from "../validators/course_validator.js";
+import { courseValidator, replaceCourseValidator } from "../validators/course_validator.js";
+import { UserModel } from "../models/auth_model.js";
 
 // Create a new course
 export const createCourse = async (req, res) => {
@@ -105,6 +106,7 @@ export const updateCourse = async (req, res, next) => {
   }
 };
 
+
 // Delete a course
 export const deleteCourse = async (req, res, next) => {
   try {
@@ -117,5 +119,73 @@ export const deleteCourse = async (req, res, next) => {
     res.status(200).json({ success: true, data: {} });
   } catch (err) {
     res.status(500).json({ success: false, error: "Server error" });
+  }
+};
+
+
+export const replaceCourse = async (req, res, next) => {
+  try {
+    // Validate incoming request
+    const { error, value } = replaceCourseValidator.validate({...req.body, 
+      videoUrl: req.files?.map((file) => {
+        return file.filename;
+      }),
+    });
+    if (error) {
+      return res.status(422).json({ message: error.details[0].message });
+    }
+
+    // Perform replace operation
+    const result = await UserModel.findOneAndReplace(
+      { _id: req.params.id },
+      value,
+      { returnDocument: "after" } 
+    );
+
+    // If no record is found, return a 404 error
+    if (!result) {
+      return res.status(404).json({ message: "Ad not found" });
+    }
+
+    // Return the updated document
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+export const searchCourses = async (req, res, next) => {
+  try {
+    // 1. Parse query parameters
+    const { 
+      title = '',
+      subject = '',
+      difficultyLevel = '',
+    } = req.query;
+
+    // 2. Build the MongoDB query
+    const query = {
+      ...(title && { title: { $regex: title, $options: 'i' } }), // Case-insensitive title search
+      ...(subject && { subject }), // Exact category match
+      ...(difficultyLevel && { difficultyLevel })
+     
+    };
+
+    // 3. Execute the query with default sorting (newest first)
+    const lessons = await CourseModel.find(query)
+      .sort({ createdAt: -1 })
+      .lean(); // Better performance
+
+    // 4. Send standardized response
+    res.status(200).json({
+      success: true,
+      count: lessons.length,
+      data: lessons
+    });
+
+  } catch (error) {
+    // 5. Consistent error handling
+    next(error);
   }
 };

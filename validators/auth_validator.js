@@ -2,6 +2,7 @@ import Joi from "joi";
 
 export const signupUserValidator = Joi.object({
   fullname: Joi.string().trim().required(),
+  age: Joi.string().trim().required(),
   email: Joi.string().email().lowercase().trim().required(),
   password: Joi.string().required(),
   confirmPassword: Joi.ref("password"),
@@ -16,5 +17,6 @@ export const loginUserValidator = Joi.object({
 
 export const updateUserValidator = Joi.object({
   fullname: Joi.string().trim().optional(),
+  age: Joi.string().trim().optional(),
   profilePicture: Joi.string().optional()
 });                                                                                                                                                                                                             

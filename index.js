@@ -2,6 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import authRouter from './routes/auth_route.js';
 import dotenv from 'dotenv'
+import courseRouter from './routes/course_route.js';
 
 
 dotenv.config()
@@ -17,7 +18,7 @@ const PORT = 6002;
 
 app.use(express.json());
 app.use('/api/users', authRouter);
-
+app.use('/api/courses', courseRouter);
 
 
 const port = process.env.PORT || 6002;
