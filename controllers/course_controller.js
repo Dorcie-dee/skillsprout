@@ -1,8 +1,5 @@
 import { CourseModel } from "../models/course_model.js";
-// import { validateCourse } from "../validators/courseValidator.js";
-import { v2 as cloudinary } from "cloudinary";
 import { courseValidator, replaceCourseValidator } from "../validators/course_validator.js";
-import { UserModel } from "../models/auth_model.js";
 
 // Create a new course
 export const createCourse = async (req, res) => {
@@ -117,8 +114,8 @@ export const deleteCourse = async (req, res, next) => {
     }
     
     res.status(200).json({ success: true, data: {} });
-  } catch (err) {
-    res.status(500).json({ success: false, error: "Server error" });
+  } catch (error) {
+    res.status(500).json({error: error.message });
   }
 };
 
@@ -136,7 +133,7 @@ export const replaceCourse = async (req, res, next) => {
     }
 
     // Perform replace operation
-    const result = await UserModel.findOneAndReplace(
+    const result = await CourseModel.findOneAndReplace(
       { _id: req.auth.id },
       value,
       { returnDocument: "after" } 
@@ -144,7 +141,7 @@ export const replaceCourse = async (req, res, next) => {
 
     // If no record is found, return a 404 error
     if (!result) {
-      return res.status(404).json({ message: "Ad not found" });
+      return res.status(404).json({ message: "Course not found" });
     }
 
     // Return the updated document
