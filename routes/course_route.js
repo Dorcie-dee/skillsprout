@@ -18,11 +18,13 @@ courseRouter.get('/:id', getCourseById);
 
 courseRouter.patch('/:id', 
   isAuthenticated, 
+  isAuthorized,
   upload.array('video', 2), 
 updateCourse);
 
 courseRouter.put('/:id', 
   isAuthenticated, 
+  isAuthorized,
   upload.array('videos', 2), 
   replaceCourse);
 
