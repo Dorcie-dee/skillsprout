@@ -1,5 +1,6 @@
 import { CourseModel } from "../models/course_model.js";
-import { courseValidator, replaceCourseValidator } from "../validators/course_validator.js";
+import { courseUpdateValidator, courseValidator, replaceCourseValidator } from "../validators/course_validator.js";
+import { Types } from "mongoose";
 
 // Create a new course
 export const createCourse = async (req, res) => {
@@ -10,7 +11,7 @@ export const createCourse = async (req, res) => {
         return file.filename;
       }),
       // pictures: req.files?.map((file) => {
-        // return file.filename;
+      // return file.filename;
       // }),
     });
     if (error) {
@@ -38,6 +39,7 @@ export const getAllCourses = async (req, res) => {
   }
 };
 
+
 // Get a single course by ID
 export const getCourseById = async (req, res) => {
   try {
@@ -53,11 +55,18 @@ export const getCourseById = async (req, res) => {
 };
 
 
+//get a specicific userId courses
 export const getTutorCourses = async (req, res) => {
   try {
-    const userId = req.auth.id
+    const userId = req.auth.id;
+
+    if (!Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: "Invalid user ID" });
+    };
+
     const all = await CourseModel.find({ userId }).exec();
-    if (!all) return res.status(404).json({ message: "Tutor not found!" });
+
+    if (!all) return res.status(404).json({ message: "No courses found for this tutor!" });
     res.status(200).json(all);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -69,13 +78,13 @@ export const getTutorCourses = async (req, res) => {
 // Update a course
 export const updateCourse = async (req, res, next) => {
   try {
-    const { error, value } = courseValidator.validate({
+    const { error, value } = courseUpdateValidator.validate({
       ...req.body,
       videoUrl: req.files?.map((file) => {
         return file.filename;
       }),
       // pictures: req.files?.map((file) => {
-        // return file.filename;
+      // return file.filename;
       // }),
     });
     if (error) {
@@ -83,21 +92,22 @@ export const updateCourse = async (req, res, next) => {
     }
     console.log(error);
 
-    // if (req.file) {
-    //   const result = await cloudinary.uploader.upload(req.file.path);
-    //   validatedData.videoUrl = result.secure_url;
-    // }
-
-    const course = await CourseModel.findByIdAndUpdate(req.auth.id, value, {
-      new: true,
-      runValidators: true,
-    });
-
+    const course = await CourseModel.findById(req.params.id);
     if (!course) {
-      return res.status(404).json({ message: "Course not found" });
+      return res.status(404).json({ message: 'Course not found' });
     }
 
-    res.status(200).json(course);
+    if (course.userId.toString() !== req.auth.id) {
+      return res.status(403).json({ message: 'Unauthorized to modify this course' });
+    }
+
+    const updatedCourse = await CourseModel.findByIdAndUpdate(
+      req.params.id,
+      { ...value, userId: req.auth.id }, // A different tutor can't update a content that isn't his/hers
+      { new: true, runValidators: true }
+    );
+
+    res.status(200).json(updatedCourse);
   } catch (error) {
     next(error);
   }
@@ -108,22 +118,33 @@ export const updateCourse = async (req, res, next) => {
 export const deleteCourse = async (req, res, next) => {
   try {
     const { id } = req.params;
-    await CourseModel.findByIdAndDelete(id).exec();
+
+    const course = await CourseModel.findById(id)
     if (!course) {
       return res.status(404).json({ message: "Course not found" });
+    };
+
+    const isOwner = course.userId.toString() === req.auth.id;
+    const isAdmin = req.auth.role === 'admin';
+
+    if (!isAdmin && !isOwner) {
+      return res.status(403).json("Unauthorized to delete this course")
     }
-    
+
+    await CourseModel.deleteOne({ _id: id })
     res.status(200).json({ success: true, data: {} });
   } catch (error) {
-    res.status(500).json({error: error.message });
+    res.status(500).json({ error: error.message });
   }
 };
 
 
+//replace a course
 export const replaceCourse = async (req, res, next) => {
   try {
     // Validate incoming request
-    const { error, value } = replaceCourseValidator.validate({...req.body, 
+    const { error, value } = replaceCourseValidator.validate({
+      ...req.body,
       videoUrl: req.files?.map((file) => {
         return file.filename;
       }),
@@ -132,17 +153,21 @@ export const replaceCourse = async (req, res, next) => {
       return res.status(422).json({ message: error.details[0].message });
     }
 
+    const course = await CourseModel.findById(req.params.id)
+    if (!course) {
+      return res.status(404).json('Course not found')
+    }
+
+    if (course.userId.toString() !== req.auth.id) {
+      return res.status(403).json("You're not authorized to perform this action")
+    }
+
     // Perform replace operation
     const result = await CourseModel.findOneAndReplace(
-      { _id: req.auth.id },
-      value,
-      { returnDocument: "after" } 
+      req.params.id,
+      { ...value, userId: req.auth.id },
+      { returnDocument: "after" }
     );
-
-    // If no record is found, return a 404 error
-    if (!result) {
-      return res.status(404).json({ message: "Course not found" });
-    }
 
     // Return the updated document
     res.status(200).json(result);
@@ -151,11 +176,11 @@ export const replaceCourse = async (req, res, next) => {
   }
 };
 
-
+//search and filtering
 export const searchCourses = async (req, res, next) => {
   try {
     // 1. Parse query parameters
-    const { 
+    const {
       title = '',
       category = '',
       difficultyLevel = '',
@@ -167,7 +192,7 @@ export const searchCourses = async (req, res, next) => {
       ...(category && { category: { $regex: category, $options: 'i' } }),
       ...(category && { category }), // Exact category match
       ...(difficultyLevel && { difficultyLevel })
-     
+
     };
 
     // 3. Execute the query with default sorting (newest first)

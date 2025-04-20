@@ -8,6 +8,11 @@ const courseSchema = new Schema({
   difficultyLevel: { type: String, enum: ["Easy", "Intermediate", "Advanced"] },
   lessonId: { type: String },
   videoUrl: { type: String },   // Cloudinary URL
+  category: {
+    type: String,
+    enum: ['art', 'nature', 'language'],
+    required: true
+  },
   pictures: { type: [String], required: true },
   quizId: { type: String },
   userId: { type: Types.ObjectId, ref: "Tutor", required: true },
