@@ -176,6 +176,7 @@ export const replaceCourse = async (req, res, next) => {
   }
 };
 
+
 //search and filtering
 export const searchCourses = async (req, res, next) => {
   try {
