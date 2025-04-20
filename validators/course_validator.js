@@ -17,12 +17,12 @@ export const courseValidator = Joi.object({
       "any.only": "Difficulty must be Easy, Intermediate, or Advanced",
       "any.required": "Difficulty level is required",
     }),
-  lesson_id: Joi.string().allow("").optional(),
-  videoUrl: Joi.string().uri().allow("").optional().messages({
+  lesson_id: Joi.string().optional(),
+  videoUrl: Joi.string().uri().optional().messages({
     "string.uri": "Video URL must be a valid URL",
   }),
-  quiz_id: Joi.string().allow("").optional(),
-  offlineActivity_id: Joi.string().allow("").optional(),
+  quiz_id: Joi.string().optional(),
+  offlineActivity_id: Joi.string().optional(),
   quiz: Joi.array()
     .items(
       Joi.object({
@@ -51,12 +51,12 @@ export const replaceCourseValidator = Joi.object({
       "any.only": "Difficulty must be Easy, Intermediate, or Advanced",
       "any.required": "Difficulty level is required",
     }),
-  lesson_id: Joi.string().allow("").optional(),
-  videoUrl: Joi.string().uri().allow("").optional().messages({
+  lesson_id: Joi.string().optional(),
+  videoUrl: Joi.string().uri().optional().messages({
     "string.uri": "Video URL must be a valid URL",
   }),
-  quiz_id: Joi.string().allow("").optional(),
-  offlineActivity_id: Joi.string().allow("").optional(),
+  quiz_id: Joi.string().optional(),
+  offlineActivity_id: Joi.string().optional(),
   quiz: Joi.array()
     .items(
       Joi.object({

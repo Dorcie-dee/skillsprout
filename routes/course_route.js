@@ -3,10 +3,11 @@ import { createCourse, deleteCourse, getAllCourses, getCourseById, replaceCourse
 import { upload } from "../middleware/upload.js";
 import { isAuthenticated, isAuthorized } from "../middleware/auth_middleware.js";
 
+
 const courseRouter = Router();
 
 courseRouter.post('/', isAuthenticated, 
-  isAuthorized(['Tutor']), 
+  isAuthorized(['tutor']), 
 upload.array('video', 2), 
 createCourse);
 

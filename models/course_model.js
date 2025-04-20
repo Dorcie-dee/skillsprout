@@ -1,12 +1,12 @@
-import { required } from "joi";
-import { Schema, model } from "mongoose";
-import { normalize } from 'normalize-mongoose'
+
+import { Schema, model, Types } from "mongoose";
+import normalize  from 'normalize-mongoose'
 
 const courseSchema = new Schema({
   title: { type: String, required: true },
   subject: { type: String, required: true },
   difficultyLevel: { type: String, enum: ["Easy", "Intermediate", "Advanced"] },
-  lessonId: { type: String, },
+  lessonId: { type: String },
   videoUrl: { type: String },   // Cloudinary URL
   pictures: { type: [String], required: true },
   quizId: { type: String },

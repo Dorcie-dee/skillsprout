@@ -1,18 +1,19 @@
+
 import { model, Schema } from "mongoose";
 // import { normalize } from "normalize-mongoose";
 
 const authSchema = new Schema({
   fullname: { type: String, required: true, unique: true },
-  age: { type: String, required: true, unique: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
+  email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+  password: { type: String, required: true, minlength: 8 },
   profilePicture: { type: String, default: "" },
-  role: { type: String, enum: ["child", "parent", "tutor"], default: "child" },
-  // googleId: { type: String } //for oauth
+  role: { type: String, enum: ["student", "tutor", "admin"], default: "student" },
+  badges: { type: [String], default: [] }, //eco hero, quiz star
+  progress: { type: Map, of: Number, default: {}}, 
+// preferences: {type: String, enum: ['nature', 'art', 'language', 3]}},
   // parentLinkedId: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // If child
-  // badges: [{ type: String }],
-  // progress: [{ lessonId: String, completed: Boolean }],
-}, { timestamps: true });
+  // googleId: { type: String } //for oauth
+}, {timestamps: true });
 
 
 

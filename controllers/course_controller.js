@@ -9,9 +9,9 @@ export const createCourse = async (req, res) => {
       videoUrl: req.files?.map((file) => {
         return file.filename;
       }),
-      pictures: req.files?.map((file) => {
-        return file.filename;
-      }),
+      // pictures: req.files?.map((file) => {
+        // return file.filename;
+      // }),
     });
     if (error) {
       return res.status(422).json(error);
@@ -74,9 +74,9 @@ export const updateCourse = async (req, res, next) => {
       videoUrl: req.files?.map((file) => {
         return file.filename;
       }),
-      pictures: req.files?.map((file) => {
-        return file.filename;
-      }),
+      // pictures: req.files?.map((file) => {
+        // return file.filename;
+      // }),
     });
     if (error) {
       return res.status(422).json({ message: error.details[0].message });
@@ -157,14 +157,15 @@ export const searchCourses = async (req, res, next) => {
     // 1. Parse query parameters
     const { 
       title = '',
-      subject = '',
+      category = '',
       difficultyLevel = '',
     } = req.query;
 
     // 2. Build the MongoDB query
     const query = {
       ...(title && { title: { $regex: title, $options: 'i' } }), // Case-insensitive title search
-      ...(subject && { subject }), // Exact category match
+      ...(category && { category: { $regex: category, $options: 'i' } }),
+      ...(category && { category }), // Exact category match
       ...(difficultyLevel && { difficultyLevel })
      
     };
