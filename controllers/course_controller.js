@@ -7,9 +7,10 @@ export const createCourse = async (req, res, next) => {
   try {
     const { error, value } = courseValidator.validate({
       ...req.body,
-      videoUrl: req.files?.map((file) => {
-        return file.filename;
-      }),
+      videoUrl: req.files?.videoUrl ? req.files.videoUrl.map(file => file.filename) : [],
+      // videoUrl: req.files?.map((file) => {
+      //   return file.filename;
+      // }),
       pictures: req.files?.map((file) => {
         return file.filename;
       }),
