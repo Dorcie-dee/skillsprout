@@ -19,9 +19,26 @@ export const courseValidator = Joi.object({
     }),
   category: Joi.string().required().valid('art', 'nature', 'language'),
   lesson_id: Joi.string().optional(),
-  videoUrl: Joi.string().uri().optional().messages({
+  // videoUrl: Joi.string().uri().optional().messages({
+  //   "string.uri": "Video URL must be a valid URL",
+  // }),
+
+  videoUrl: Joi.alternatives()
+  .try(
+    Joi.string().uri().optional(), // Single video URL (string)
+    Joi.array().items(Joi.string().uri()).optional(), // Multiple video URLs (array of strings)
+    Joi.array().items(Joi.object({
+      fieldname: Joi.string().valid('videoUrl').required(), // Expect the field to be 'videoUrl' for file upload
+      filename: Joi.string().required(), // File name from Cloudinary after upload
+      url: Joi.string().uri().required() // URL of the uploaded file in Cloudinary
+    })).optional() // If it's an array of file uploads
+  )
+  .messages({
     "string.uri": "Video URL must be a valid URL",
+    "array.includes": "Video URLs must be an array of valid URLs",
   }),
+
+
   quiz_id: Joi.string().optional(),
   offlineActivity_id: Joi.string().optional(),
   quiz: Joi.array()
@@ -74,12 +91,28 @@ export const replaceCourseValidator = Joi.object({
     }),
   category: Joi.string().required().valid('art', 'nature', 'language'),
   lesson_id: Joi.string().optional(),
-  videoUrl: Joi.array().items(Joi.string().uri().messages({
+  // videoUrl: Joi.array().items(Joi.string().uri().messages({
+    // "string.uri": "Video URL must be a valid URL",
+  // })).optional(),
+  
+  videoUrl: Joi.alternatives()
+  .try(
+    Joi.string().uri().optional(), // Single video URL (string)
+    Joi.array().items(Joi.string().uri()).optional(), // Multiple video URLs (array of strings)
+    Joi.array().items(Joi.object({
+      fieldname: Joi.string().valid('videoUrl').required(), // Expect the field to be 'videoUrl' for file upload
+      filename: Joi.string().required(), // File name from Cloudinary after upload
+      url: Joi.string().uri().required() // URL of the uploaded file in Cloudinary
+    })).optional() // If it's an array of file uploads
+  )
+  .messages({
     "string.uri": "Video URL must be a valid URL",
-  })).optional(),
-  
+    "array.includes": "Video URLs must be an array of valid URLs",
+  }),
+
+
   pictures: Joi.array().items(Joi.string()).optional(),
-  
+
   quiz_id: Joi.string().optional(),
   offlineActivity_id: Joi.string().optional(),
   quiz: Joi.array()
@@ -92,6 +125,36 @@ export const replaceCourseValidator = Joi.object({
     )
     .optional(),
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // Validate course data
 // export const validateCourse = (data) => {

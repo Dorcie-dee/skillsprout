@@ -12,7 +12,7 @@ export const upload = multer({
   storage: new CloudinaryStorage({
     cloudinary,
     params: {
-      folder: "/skillsprout/course-videos"
+      folder: "/skillsprout/course-pictures"
     },
   }),
 });
