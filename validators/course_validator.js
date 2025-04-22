@@ -74,9 +74,12 @@ export const replaceCourseValidator = Joi.object({
     }),
   category: Joi.string().required().valid('art', 'nature', 'language'),
   lesson_id: Joi.string().optional(),
-  videoUrl: Joi.string().uri().optional().messages({
+  videoUrl: Joi.array().items(Joi.string().uri().messages({
     "string.uri": "Video URL must be a valid URL",
-  }),
+  })).optional(),
+  
+  pictures: Joi.array().items(Joi.string()).optional(),
+  
   quiz_id: Joi.string().optional(),
   offlineActivity_id: Joi.string().optional(),
   quiz: Joi.array()

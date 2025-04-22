@@ -12,7 +12,6 @@ authRouter.post('/logout', logoutUser);
 
 
 //password reseting
-
 authRouter.post('/forgot-password', forgotPassword);
 
 authRouter.post('/reset-password/:token', resetPassword);
