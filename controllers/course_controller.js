@@ -15,6 +15,7 @@ export const createCourse = async (req, res, next) => {
       // pictures: req.files?.map((file) => {
         // return file.filename;
       // }),
+      quiz: req.body.quiz ? JSON.parse(req.body.quiz) : [], // Parse the quiz JSON string into an array
     });
 
     if (error) {
@@ -83,12 +84,15 @@ export const updateCourse = async (req, res, next) => {
   try {
     const { error, value } = courseUpdateValidator.validate({
       ...req.body,
-      videoUrl: req.files?.map((file) => {
-        return file.filename;
-      }),
-      pictures: req.files?.map((file) => {
-        return file.filename;
-      }),
+      videoUrl: req.files?.videoUrl ? req.files.videoUrl.map(file => file.filename) : [],
+      // videoUrl: req.files?.map((file) => {
+      //   return file.filename;
+      // }),
+      pictures: req.files?.pictures ? req.files.pictures.map(file => file.filename) : [], 
+      // pictures: req.files?.map((file) => {
+        // return file.filename;
+      // }),
+      quiz: req.body.quiz ? JSON.parse(req.body.quiz) : [], // Parse the quiz JSON string into an array
     });
 
     if (error) {
@@ -149,12 +153,15 @@ export const replaceCourse = async (req, res, next) => {
     // Validate incoming request
     const { error, value } = replaceCourseValidator.validate({
       ...req.body,
-      videoUrl: req.files?.map((file) => {
-        return file.filename;
-      }),
-      pictures: req.files?.map((file) => {
-        return file.filename;
-      }),
+      videoUrl: req.files?.videoUrl ? req.files.videoUrl.map(file => file.filename) : [],
+      // videoUrl: req.files?.map((file) => {
+      //   return file.filename;
+      // }),
+      pictures: req.files?.pictures ? req.files.pictures.map(file => file.filename) : [], 
+      // pictures: req.files?.map((file) => {
+        // return file.filename;
+      // }),
+      quiz: req.body.quiz ? JSON.parse(req.body.quiz) : [], // Parse the quiz JSON string into an array
     });
     if (error) {
       return res.status(422).json({ message: error.details[0].message });

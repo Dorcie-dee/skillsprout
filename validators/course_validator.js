@@ -41,6 +41,7 @@ export const courseValidator = Joi.object({
 
   quiz_id: Joi.string().optional(),
   offlineActivity_id: Joi.string().optional(),
+  
   quiz: Joi.array()
     .items(
       Joi.object({
