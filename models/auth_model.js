@@ -13,18 +13,24 @@ const authSchema = new Schema({
 // preferences: {type: String, enum: ['nature', 'art', 'language', 3]}},
   // parentLinkedId: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // If child
   // googleId: { type: String } //for oauth
+
+  resetPasswordToken: { type: String },
+  resetPasswordExpires: { type: Date },
+
 }, {timestamps: true });
 
 
-
-// authSchema.plugin(normalize);
 
 const blacklistSchema = new Schema({});
 blacklistSchema.index({ createdAt: 1 },
   {
     expireAfterSeconds: 60 * 60 * 24
   }
-)
+);
+
+
+// authSchema.plugin(normalize);
 
 export const UserModel = model('User', authSchema);
+
 export const BlacklistModel = model('Blacklist', blacklistSchema);

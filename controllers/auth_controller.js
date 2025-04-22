@@ -1,9 +1,9 @@
 import { BlacklistModel, UserModel } from "../models/auth_model.js";
 import { loginUserValidator, signupUserValidator, updateUserValidator } from "../validators/auth_validator.js"
-
+import crypto from 'crypto';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken'
-
+// import { registerUserMailTemplate } from "../utils/mailing.js";
 
 
 
@@ -117,6 +117,92 @@ export const updateUserProfile = async (req, res, next) => {
   }
 }
 
+
+export const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    //Checking if user exists
+    const user = await UserModel.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "No user with that email found." });
+    }
+
+    //Generating reset token
+    const resetToken = crypto.randomBytes(32).toString("hex");
+
+    //Hashing token before storing in my DB
+    const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+
+    //Saving token and expiry sent to user
+    user.resetPasswordToken = hashedToken;
+    user.resetPasswordExpires = Date.now() + 1200000; // 20 mins
+    await user.save();
+
+    //Sending email
+    const resetUrl = `http://localhost:3000/reset-password/${resetToken}`; // frontend URL
+
+    const message = `
+      <h2>Password Reset Request</h2>
+      <p>Hello ${user.fullname},</p>
+      <p>Click the link below to reset your password:</p>
+      <a href="${resetUrl}">Reset Password</a>
+      <p>This link expires in 20 minutes.</p>
+    `;
+
+    res.status(200).json({ message: "Password reset link sent!" });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to send reset link.", error: err.message });
+  }
+};
+
+
+export const resetPassword = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { password } = req.body;
+
+    if (!password || password.length < 8) {
+      return res.status(422).json({ message: "Password must be at least 8 characters long." });
+    }
+
+    // Hashing the token received in URL
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+    // Finding a user with this token and ensure it's not expired
+    const user = await UserModel.findOne({
+      resetPasswordToken: hashedToken,
+      resetPasswordExpires: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid or expired reset token." });
+    }
+
+    // Hashing new password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    //password updated
+    user.password = hashedPassword;
+
+    // Clearing reset token fields
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+
+    // Saving updated user
+    await user.save();
+
+    res.status(200).json({ message: "Password reset successful. Please log in." });
+
+  } catch (error) {
+    console.error("Error resetting password:", error);
+    res.status(500).json({ message: "Failed to reset password", error: error.message });
+  }
+};
+
+
 //logout
 export const logoutUser = async (req, res, next) => {
   try {
@@ -137,4 +223,5 @@ export const logoutUser = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-} 
+}
+

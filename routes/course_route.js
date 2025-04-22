@@ -2,6 +2,7 @@ import { Router } from "express";
 import { createCourse, deleteCourse, getAllCourses, getCourseById, getTutorCourses, replaceCourse, searchCourses, updateCourse } from "../controllers/course_controller.js";
 import { upload } from "../middleware/upload.js";
 import { isAuthenticated, isAuthorized } from "../middleware/auth_middleware.js";
+import { completeLesson } from "../controllers/gamification_controller.js";
 
 
 const courseRouter = Router();
@@ -10,6 +11,10 @@ courseRouter.post('/', isAuthenticated,
   isAuthorized(['tutor', 'admin']), 
 upload.array('video', 2), 
 createCourse);
+
+
+courseRouter.post('/complete', isAuthenticated, completeLesson);
+
 
 courseRouter.get('/', getAllCourses);
 
