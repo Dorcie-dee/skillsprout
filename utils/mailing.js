@@ -1,7 +1,7 @@
 import { createTransport } from 'nodemailer'
 
 export const mailTransporter = createTransport({
-  host: 'gmail',
+  service: 'gmail',
   auth: {
     user: process.env.HOST_EMAIL,
     pass: process.env.HOST_PASS
@@ -28,9 +28,9 @@ export const sendEmail = async (to, subject, html) => {
 
 
 
-export const registerUserMailTemplate = `<div>
-      <h2>Password Reset Request</h2>
-      <p>Click the link below to reset your password:</p>
-      <a href="${resetUrl}">Reset Password</a>
-      <p>This link expires in 20 minutes.</p>
-    </div>`
+// export const registerUserMailTemplate = `<div>
+//       <h2>Password Reset Request</h2>
+//       <p>Click the link below to reset your password:</p>
+//       <a href="${resetUrl}">Reset Password</a>
+//       <p>This link expires in 20 minutes.</p>
+//     </div>`

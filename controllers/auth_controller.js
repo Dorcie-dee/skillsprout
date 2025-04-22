@@ -3,6 +3,7 @@ import { loginUserValidator, signupUserValidator, updateUserValidator } from "..
 import crypto from 'crypto';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken'
+import { mailTransporter } from "../utils/mailing.js";
 // import { registerUserMailTemplate } from "../utils/mailing.js";
 
 
@@ -149,6 +150,13 @@ export const forgotPassword = async (req, res) => {
       <a href="${resetUrl}">Reset Password</a>
       <p>This link expires in 20 minutes.</p>
     `;
+  
+    await mailTransporter.sendMail({
+      from: `"SkillSprout" <${process.env.HOST_EMAIL}>`,
+      to: user.email,
+      subject: "Password Reset Request",
+      html: message
+    });
 
     res.status(200).json({ message: "Password reset link sent!" });
 
