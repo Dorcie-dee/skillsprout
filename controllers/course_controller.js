@@ -11,9 +11,10 @@ export const createCourse = async (req, res, next) => {
       // videoUrl: req.files?.map((file) => {
       //   return file.filename;
       // }),
-      pictures: req.files?.map((file) => {
-        return file.filename;
-      }),
+      pictures: req.files?.pictures ? req.files.pictures.map(file => file.filename) : [], 
+      // pictures: req.files?.map((file) => {
+        // return file.filename;
+      // }),
     });
 
     if (error) {
