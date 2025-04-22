@@ -7,13 +7,13 @@ import { completeLesson } from "../controllers/gamification_controller.js";
 
 const courseRouter = Router();
 
-courseRouter.post('/', isAuthenticated, 
-  isAuthorized(['tutor', 'admin']), 
+courseRouter.post('/', isAuthenticated,
+  isAuthorized(['tutor', 'admin']),
   upload.fields([
-    { name: 'videoUrl', maxCount: 1 },
+    { name: 'videoUrl', maxCount: 2 },
     { name: 'pictures', maxCount: 5 }
-  ]), 
-createCourse);
+  ]),
+  createCourse);
 
 
 courseRouter.post('/complete', isAuthenticated, completeLesson);
@@ -27,20 +27,26 @@ courseRouter.get('/search', searchCourses);
 
 courseRouter.get('/:id', getCourseById);
 
-courseRouter.patch('/:id', 
-  isAuthenticated, 
+courseRouter.patch('/:id',
+  isAuthenticated,
   isAuthorized(['tutor', 'admin']),
-  upload.array('video', 2), 
-updateCourse);
+  upload.fields([
+    { name: 'videoUrl', maxCount: 2 },
+    { name: 'pictures', maxCount: 5 }
+  ]),
+  updateCourse);
 
-courseRouter.put('/:id', 
-  isAuthenticated, 
+courseRouter.put('/:id',
+  isAuthenticated,
   isAuthorized(['tutor', 'admin']),
-  upload.array('videos', 2), 
+  upload.fields([
+    { name: 'videoUrl', maxCount: 2 },
+    { name: 'pictures', maxCount: 5 }
+  ]),
   replaceCourse);
 
-courseRouter.delete('/:id', 
-  isAuthenticated, 
+courseRouter.delete('/:id',
+  isAuthenticated,
   isAuthorized(['tutor', 'admin']),
   deleteCourse);
 
