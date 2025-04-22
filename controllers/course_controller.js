@@ -3,7 +3,7 @@ import { courseUpdateValidator, courseValidator, replaceCourseValidator } from "
 import { Types } from "mongoose";
 
 // Create a new course
-export const createCourse = async (req, res) => {
+export const createCourse = async (req, res, next) => {
   try {
     const { error, value } = courseValidator.validate({
       ...req.body,
