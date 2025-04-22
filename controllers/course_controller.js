@@ -10,10 +10,11 @@ export const createCourse = async (req, res) => {
       videoUrl: req.files?.map((file) => {
         return file.filename;
       }),
-      // pictures: req.files?.map((file) => {
-      // return file.filename;
-      // }),
+      pictures: req.files?.map((file) => {
+        return file.filename;
+      }),
     });
+
     if (error) {
       return res.status(422).json(error);
     }
@@ -83,10 +84,11 @@ export const updateCourse = async (req, res, next) => {
       videoUrl: req.files?.map((file) => {
         return file.filename;
       }),
-      // pictures: req.files?.map((file) => {
-      // return file.filename;
-      // }),
+      pictures: req.files?.map((file) => {
+        return file.filename;
+      }),
     });
+
     if (error) {
       return res.status(422).json({ message: error.details[0].message });
     }
@@ -146,6 +148,9 @@ export const replaceCourse = async (req, res, next) => {
     const { error, value } = replaceCourseValidator.validate({
       ...req.body,
       videoUrl: req.files?.map((file) => {
+        return file.filename;
+      }),
+      pictures: req.files?.map((file) => {
         return file.filename;
       }),
     });

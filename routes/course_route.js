@@ -9,7 +9,10 @@ const courseRouter = Router();
 
 courseRouter.post('/', isAuthenticated, 
   isAuthorized(['tutor', 'admin']), 
-upload.array('video', 2), 
+  upload.fields([
+    { name: 'videoUrl', maxCount: 1 },
+    { name: 'pictures', maxCount: 5 }
+  ]), 
 createCourse);
 
 
