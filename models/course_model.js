@@ -7,7 +7,7 @@ const courseSchema = new Schema({
   subject: { type: String, required: true },
   difficultyLevel: { type: String, enum: ["Easy", "Intermediate", "Advanced"] },
   lessonId: { type: String },
-  videoUrl: { type: String },
+  videoUrl: [{ type: String }],
   category: {
     type: String,
     enum: ['art', 'nature', 'language'],

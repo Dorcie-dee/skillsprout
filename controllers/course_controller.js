@@ -17,6 +17,9 @@ export const createCourse = async (req, res, next) => {
       // }),
       quiz: req.body.quiz ? JSON.parse(req.body.quiz) : [], // Parse the quiz JSON string into an array
     });
+    console.log('Received quiz:', req.body.quiz);
+    console.log('After JSON.parse:', JSON.parse(req.body.quiz));
+    
 
     if (error) {
       return res.status(422).json(error);

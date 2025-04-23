@@ -22,7 +22,6 @@ export const courseValidator = Joi.object({
   // videoUrl: Joi.string().uri().optional().messages({
   //   "string.uri": "Video URL must be a valid URL",
   // }),
-
   videoUrl: Joi.alternatives()
   .try(
     Joi.string().uri().optional(), // Single video URL (string)
@@ -37,11 +36,9 @@ export const courseValidator = Joi.object({
     "string.uri": "Video URL must be a valid URL",
     "array.includes": "Video URLs must be an array of valid URLs",
   }),
-
-
+  pictures: Joi.array().items(Joi.string()).optional(),
   quiz_id: Joi.string().optional(),
   offlineActivity_id: Joi.string().optional(),
-  
   quiz: Joi.array()
     .items(
       Joi.object({
