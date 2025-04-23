@@ -23,5 +23,5 @@ app.use('/api/courses', courseRouter);
 
 const port = process.env.PORT || 6002;
 app.listen(PORT, () => {
-  console.log("Server running on Jollof rice with grilled chicken")
+  console.log("Server running smoothly")
 });

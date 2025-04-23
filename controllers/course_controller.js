@@ -11,15 +11,15 @@ export const createCourse = async (req, res, next) => {
       // videoUrl: req.files?.map((file) => {
       //   return file.filename;
       // }),
-      pictures: req.files?.pictures ? req.files.pictures.map(file => file.filename) : [], 
+      pictures: req.files?.pictures ? req.files.pictures.map(file => file.filename) : [],
       // pictures: req.files?.map((file) => {
-        // return file.filename;
+      // return file.filename;
       // }),
       quiz: req.body.quiz ? JSON.parse(req.body.quiz) : [], // Parse the quiz JSON string into an array
     });
     console.log('Received quiz:', req.body.quiz);
     console.log('After JSON.parse:', JSON.parse(req.body.quiz));
-    
+
 
     if (error) {
       return res.status(422).json(error);
@@ -91,9 +91,9 @@ export const updateCourse = async (req, res, next) => {
       // videoUrl: req.files?.map((file) => {
       //   return file.filename;
       // }),
-      pictures: req.files?.pictures ? req.files.pictures.map(file => file.filename) : [], 
+      pictures: req.files?.pictures ? req.files.pictures.map(file => file.filename) : [],
       // pictures: req.files?.map((file) => {
-        // return file.filename;
+      // return file.filename;
       // }),
       quiz: req.body.quiz ? JSON.parse(req.body.quiz) : [], // Parse the quiz JSON string into an array
     });
@@ -153,6 +153,15 @@ export const deleteCourse = async (req, res, next) => {
 //replace a course
 export const replaceCourse = async (req, res, next) => {
   try {
+
+    let quizData; // declare without value
+
+    if (typeof req.body.quiz === 'string') {
+      quizData = JSON.parse(req.body.quiz); // assign value after parsing
+    } else {
+      quizData = req.body.quiz; // assign directly if already an object
+    }
+
     // Validate incoming request
     const { error, value } = replaceCourseValidator.validate({
       ...req.body,
@@ -160,11 +169,11 @@ export const replaceCourse = async (req, res, next) => {
       // videoUrl: req.files?.map((file) => {
       //   return file.filename;
       // }),
-      pictures: req.files?.pictures ? req.files.pictures.map(file => file.filename) : [], 
+      pictures: req.files?.pictures ? req.files.pictures.map(file => file.filename) : [],
       // pictures: req.files?.map((file) => {
-        // return file.filename;
+      // return file.filename;
       // }),
-      quiz: req.body.quiz ? JSON.parse(req.body.quiz) : [], // Parse the quiz JSON string into an array
+      quiz: quizData,  // Parse the quiz JSON string into an array
     });
     if (error) {
       return res.status(422).json({ message: error.details[0].message });
@@ -181,7 +190,7 @@ export const replaceCourse = async (req, res, next) => {
 
     // Perform replace operation
     const result = await CourseModel.findOneAndReplace(
-      req.params.id,
+      { _id: req.params.id },
       { ...value, userId: req.auth.id },
       { returnDocument: "after" }
     );
