@@ -38,6 +38,12 @@ export const signupUser = async (req, res) => {
     //password hashing
     const hashPassword = await bcrypt.hash(value.password, 10);
 
+    if (value.role !== 'student') {
+      delete req.body.badges;
+      delete req.body.progress;
+    }
+    
+
     //new user
     const incomingUser = await UserModel.create({
       ...value,
