@@ -1,7 +1,8 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import authRouter from './routes/auth_route.js';
-import dotenv from 'dotenv'
+import dotenv from 'dotenv';
+import cors from 'cors';
 import courseRouter from './routes/course_route.js';
 
 
