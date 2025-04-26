@@ -15,7 +15,7 @@ await mongoose.connect(process.env.MONGO_URI)
 const app = express();
 const PORT = 6002;
 
-
+app.use(cors());
 app.use(express.json());
 app.use('/api/users', authRouter);
 app.use('/api/courses', courseRouter);
