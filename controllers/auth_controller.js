@@ -13,52 +13,55 @@ export const signupUser = async (req, res) => {
   try {
     const { error, value } = signupUserValidator.validate(req.body);
     if (error) {
-      return res.status(422).json({ message: error.message })
+      return res.status(422).json({ message: error.details[0].message });
     }
 
     const userExisting = await UserModel.findOne({
       $or: [
-        {
-          fullname: value.fullname
-          // firstName: value.firstName,
-          // lastName: value.lastName
-        },
+        { fullname: value.fullname },
         { email: value.email }
       ]
     });
     if (userExisting) {
-      return res.status(409).json('User already exists')
+      return res.status(409).json({ message: 'User already exists' });
     }
 
-    //generating profile pic using initials
-    // const initials = `${value.firstName.charAt(0)}${value.lastName.charAt(0)}`.toUpperCase();
     const initials = `${value.fullname.charAt(0)}${value.fullname.charAt(1)}`.toUpperCase();
-    const profilePictureUrl = `https:ui-avatars.com/api/?name=${initials}&background=random`;
+    const profilePictureUrl = `https://ui-avatars.com/api/?name=${initials}&background=random`;
 
-    //password hashing
     const hashPassword = await bcrypt.hash(value.password, 10);
 
     if (value.role !== 'student') {
-      delete req.body.badges;
-      delete req.body.progress;
+      delete value.badges;
+      delete value.progress;
     }
-    
 
-    //new user
-    const incomingUser = await UserModel.create({
+    const incomingUser = new UserModel({
       ...value,
       password: hashPassword,
       profilePicture: profilePictureUrl
     });
 
-    res.status(201).json({
-      message: 'User registered successfully'
-    })
+    const savedUser = await incomingUser.save();
 
+    res.status(201).json({
+      message: 'User registered successfully',
+      user: {
+        id: savedUser._id,
+        fullname: savedUser.fullname,
+        email: savedUser.email,
+        profilePicture: savedUser.profilePicture,
+        role: savedUser.role,
+      }
+    });
+    
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error(error); // Always log server errors
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 };
+
+
 
 
 //login
