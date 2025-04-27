@@ -54,11 +54,16 @@ export const signupUser = async (req, res) => {
         role: savedUser.role,
       }
     });
-    
+
   } catch (error) {
-    console.error(error); // Always log server errors
-    res.status(500).json({ message: 'Internal Server Error' });
+    // Handling Mongoose validation errors
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ message: error.message });
+    }
+
+    res.status(500).json({ error: error.message });
   }
+
 };
 
 
@@ -159,7 +164,7 @@ export const forgotPassword = async (req, res) => {
       <a href="${resetUrl}">Reset Password</a>
       <p>This link expires in 20 minutes.</p>
     `;
-  
+
     await mailTransporter.sendMail({
       from: `"SkillSprout" <${process.env.HOST_EMAIL}>`,
       to: user.email,
